@@ -1,5 +1,6 @@
 import { Profiler, type ProfilerOnRenderCallback, useState } from "react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
+import { Monitor, Moon, Sun } from "lucide-react";
 import { LegendBenchmarkList } from "./benchmark/LegendBenchmarkList";
 import { TanStackBenchmarkList } from "./benchmark/TanStackBenchmarkList";
 import {
@@ -22,8 +23,11 @@ import {
 
 const ITEM_COUNT_OPTIONS = [10000, 25000, 50000, 100000, 1000000];
 const LIST_LIBRARY_OPTIONS = ["tanstack", "legend"] as const;
+const THEME_OPTIONS = ["light", "system", "dark"] as const;
 const LIST_HEIGHT = 560;
 const DEFAULT_ITEM_COUNT = 10000;
+const THEME_STORAGE_KEY = "theme";
+type ThemeSetting = (typeof THEME_OPTIONS)[number];
 
 function createMetricsState(): Record<ListLibrary, BenchmarkMetrics> {
   return {
@@ -56,6 +60,44 @@ function formatMB(value: number | null) {
   return `${(value / 1024 / 1024).toFixed(2)}MB`;
 }
 
+function getSystemTheme() {
+  if (typeof window === "undefined") {
+    return "light";
+  }
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+function resolveTheme(setting: ThemeSetting) {
+  return setting === "system" ? getSystemTheme() : setting;
+}
+
+function applyTheme(setting: ThemeSetting) {
+  if (typeof document === "undefined") {
+    return;
+  }
+
+  const nextTheme = resolveTheme(setting);
+  document.documentElement.classList.toggle("dark", nextTheme === "dark");
+}
+
+function loadThemeSetting() {
+  if (typeof window === "undefined") {
+    return "system";
+  }
+
+  const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+  if (stored === "light" || stored === "dark" || stored === "system") {
+    applyTheme(stored);
+    return stored;
+  }
+
+  applyTheme("system");
+  return "system";
+}
+
 function App() {
   const [activeLibrary, setActiveLibrary] = useQueryState(
     "library",
@@ -65,6 +107,7 @@ function App() {
   const [seedInput, setSeedInput] = useState(String(DEFAULT_BENCHMARK_SEED));
   const [itemCount, setItemCount] = useState(DEFAULT_ITEM_COUNT);
   const [datasetVersion, setDatasetVersion] = useState(0);
+  const [themeSetting, setThemeSetting] = useState(loadThemeSetting);
   const [employees, setEmployees] = useState(() =>
     generateEmployees(DEFAULT_ITEM_COUNT, { seed: DEFAULT_BENCHMARK_SEED })
   );
@@ -158,16 +201,72 @@ function App() {
   const activeMetrics = metricsByLibrary[activeLibrary];
   const listKey = `${activeLibrary}-${datasetVersion}`;
 
+  const updateTheme = (nextTheme: ThemeSetting) => {
+    setThemeSetting(nextTheme);
+    applyTheme(nextTheme);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+    }
+  };
+
   return (
     <main className="mx-auto flex w-full max-w-[1700px] flex-col gap-4 p-6">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Virtual List Benchmark
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Compare TanStack Virtual and Legend List using the same dataset and
-          row renderer.
-        </p>
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Virtual List Benchmark
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Compare TanStack Virtual and Legend List using the same dataset and
+            row renderer.
+          </p>
+        </div>
+
+        <div className="inline-flex items-center gap-1 rounded-xl border border-border bg-muted/50 p-1">
+          <span className="px-2 text-sm text-muted-foreground">Theme</span>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label="Light theme"
+            aria-pressed={themeSetting === "light"}
+            onClick={() => updateTheme("light")}
+            className={
+              themeSetting === "light"
+                ? "border border-border bg-background text-foreground shadow-sm"
+                : "text-muted-foreground"
+            }
+          >
+            <Sun />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label="System theme"
+            aria-pressed={themeSetting === "system"}
+            onClick={() => updateTheme("system")}
+            className={
+              themeSetting === "system"
+                ? "border border-border bg-background text-foreground shadow-sm"
+                : "text-muted-foreground"
+            }
+          >
+            <Monitor />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label="Dark theme"
+            aria-pressed={themeSetting === "dark"}
+            onClick={() => updateTheme("dark")}
+            className={
+              themeSetting === "dark"
+                ? "border border-border bg-background text-foreground shadow-sm"
+                : "text-muted-foreground"
+            }
+          >
+            <Moon />
+          </Button>
+        </div>
       </header>
 
       <section className="rounded-xl border border-border bg-background p-4">
