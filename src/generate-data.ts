@@ -35,6 +35,16 @@ export interface Employee {
   Mail: string;
 }
 
+export const DEFAULT_BENCHMARK_SEED = 20260220;
+
+interface GenerationOptions {
+  seed?: number;
+}
+
+export function resetGeneratorSeed(seed = DEFAULT_BENCHMARK_SEED) {
+  faker.seed(seed);
+}
+
 export function generateEmployee(): Employee {
   const gender = faker.helpers.arrayElement(genders);
   const sex =
@@ -60,6 +70,13 @@ export function generateEmployee(): Employee {
   };
 }
 
-export function generateEmployees(count: number): Employee[] {
+export function generateEmployees(
+  count: number,
+  options?: GenerationOptions
+): Employee[] {
+  if (typeof options?.seed === "number") {
+    faker.seed(options.seed);
+  }
+
   return Array.from({ length: count }, () => generateEmployee());
 }
