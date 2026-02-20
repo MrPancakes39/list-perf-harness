@@ -66,9 +66,72 @@ const render = (count: number) => Math.floor((1.7 * count) / 1000 / 10) * 10;
 ### Scroll Frames Per Second
 
 - Scroll FPS was pretty similar between both libraries across most item counts.
-- Legend List seemed to keep FPS a bit higher at higher item counts.**\***
+- Legend List seemed to keep FPS a bit higher at higher item counts (see [Rendering Caveat](#rendering-caveat)).
 - Firefox scrolling was surprisingly smoother than Helium in practice, with no white / empty items reached, especially with Legend List.
 
 ### Memory Usage
 
 - Memory usage showed no meaningful difference between Legend List and TanStack Virtual in my tests.
+
+### Rendering Caveat
+
+- In my runs, Legend List starts showing rendering issues from around 50K items and up.
+- The issues include wrong scroll offsets and cases where some items do not render at all.
+
+<details>
+<summary>Item at wrong scroll offset at 50K screenshot</summary>
+
+![Legend List at 50K items showing rendering issues, including misaligned scroll offset](./imgs/50k_legend.png)
+
+</details>
+
+<details>
+<summary>Items not rendering at 100K screenshot</summary>
+
+![Legend List at 100K items showing not-rendered rows in the viewport](./imgs/100k_legend.png)
+
+</details>
+
+<details>
+<summary>Legend item overlap screenshot</summary>
+
+![Legend List showing overlapping list items where rows render on top of each other](./imgs/legend_item_overlap.jpeg)
+
+</details>
+
+<br />
+
+- At 1M items, Legend List shows no items on initial render and only starts showing rows after scrolling.
+- In my tests, the 1M case only worked in Helium: Epiphany crashed, and Firefox appeared to treat the `100_000_000px` container as `0px` height.
+
+<details>
+<summary>Legend List at 1M initial view (items rendered after scroll)</summary>
+
+![Legend List at 1M items on initial load showing a blank list area until scrolling triggers visible rows](./imgs/1m_legend_start.png)
+
+</details>
+
+### Positive Note
+
+- The 1M-item stress also breaks TanStack Virtual, so this extreme limit is not specific to Legend List.
+- In Epiphany, TanStack Virtual crashed.
+- In Firefox, TanStack Virtual only rendered the first 95 items.
+- In Helium, TanStack Virtual rendered some items but not all of them (see screenshot below).
+
+<details>
+<summary>TanStack Virtual at 1M in Helium (partial rendering)</summary>
+
+![TanStack Virtual at 1M items in Helium showing partial rendering where only part of the expected list appears](./imgs/1m_tanstack_helium.jpeg)
+
+</details>
+
+<br />
+
+- Even with those rendering issues, Legend List could still render the end / near-end portion of the 1M-row dataset in some runs.
+
+<details>
+<summary>Legend List at 1M near end of list (rendered)</summary>
+
+![Legend List at 1M items showing rows near the end of the dataset rendered after scrolling](./imgs/1m_legend_near_end.jpeg)
+
+</details>
