@@ -19,23 +19,23 @@ interface EmployeeItemProps {
 
 export function EmployeeItem({ employee, rowNumber }: EmployeeItemProps) {
   return (
-    <div className="flex h-[58px] items-center gap-4 border-b border-gray-200 py-0">
-      <div className="w-10 shrink-0 text-right text-xs tabular-nums text-gray-400">
+    <div className="flex h-[58px] items-center gap-4 border-b border-border py-0">
+      <div className="w-10 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
         {rowNumber}
       </div>
       <div className="flex min-w-0 flex-[1.4] items-center gap-3">
         <Avatar gender={employee.Gender} />
-        <span className="truncate font-medium text-gray-900">
+        <span className="truncate font-medium text-foreground">
           {employee.Employees}
         </span>
       </div>
-      <div className="min-w-0 flex-[0.75] truncate text-gray-600">
+      <div className="min-w-0 flex-[0.75] truncate text-muted-foreground">
         {employee.Designation}
       </div>
-      <div className="min-w-0 flex-[0.95] truncate text-xs text-gray-600">
+      <div className="min-w-0 flex-[0.95] truncate text-xs text-muted-foreground">
         {employee.Mail}
       </div>
-      <div className="flex min-w-0 flex-[0.95] items-center gap-1.5 text-gray-600">
+      <div className="flex min-w-0 flex-[0.95] items-center gap-1.5 text-muted-foreground">
         <MapPinIcon className="h-4 w-4 shrink-0" />
         <span className="truncate">{employee.Location}</span>
       </div>
@@ -53,10 +53,10 @@ export function EmployeeItem({ employee, rowNumber }: EmployeeItemProps) {
       <div className="min-w-0 flex-1">
         <SoftwareProgressBar value={employee.Software} />
       </div>
-      <div className="min-w-0 flex-1 text-gray-600">
+      <div className="min-w-0 flex-1 text-muted-foreground">
         {currencyFormatter.format(employee.CurrentSalary)}
       </div>
-      <div className="min-w-0 flex-1 truncate text-xs text-gray-600">
+      <div className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
         {employee.Address}
       </div>
     </div>
