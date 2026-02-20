@@ -12,8 +12,10 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
-    "@fontsource-variable/geist": "^5.2.8",
     "@faker-js/faker": "^10.3.0",
+    "@fontsource-variable/geist": "^5.2.8",
+    "@legendapp/list": "3.0.0-beta.33",
+    "@tanstack/react-virtual": "^3.13.18",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.575.0",
