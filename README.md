@@ -35,7 +35,7 @@ OS: Pop!\_OS 24.04 COSMIC (kernel 6.18.7-76061807-generic, arch x86_64)
 
 These findings are more anecdotal and experimental than strictly scientific. I combined how the UI felt during manual interaction with the recorded metrics, since I'm not fully sure how to formalize visual UI testing in this benchmark.
 
-> Disclaimer: the numbers discussed below are from my machine, and I am using Helium as the reference browser because Firefox and Epiphany showed worse numbers / performance.
+> Disclaimer: the numbers discussed below are from my machine, and I generally use Helium as the reference browser for the numeric comparisons.
 
 Item count range used in findings: 10K to 1M items.
 
@@ -62,3 +62,13 @@ const render = (count: number) => Math.floor((1.7 * count) / 1000 / 10) * 10;
 | 1M         | ~75                       | ~1700 to ~3000, depending on situation |
 
 **Note:** I know the 1M-row case is a bit absurd for many real-world UIs, but it is still interesting to test as a stress case.
+
+### Scroll Frames Per Second
+
+- Scroll FPS was pretty similar between both libraries across most item counts.
+- Legend List seemed to keep FPS a bit higher at higher item counts.**\***
+- Firefox scrolling was surprisingly smoother than Helium in practice, with no white / empty items reached, especially with Legend List.
+
+### Memory Usage
+
+- Memory usage showed no meaningful difference between Legend List and TanStack Virtual in my tests.
