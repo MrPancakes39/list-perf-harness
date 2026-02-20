@@ -126,8 +126,6 @@ const render = (count: number) => Math.floor((1.7 * count) / 1000 / 10) * 10;
 
 </details>
 
-<br />
-
 - At 1M items, Legend List shows no items on initial render and only starts showing rows after scrolling.
 - In my tests, the 1M case only worked in Helium: Epiphany crashed, and Firefox appeared to treat the `100_000_000px` container as `0px` height.
 
@@ -151,8 +149,6 @@ const render = (count: number) => Math.floor((1.7 * count) / 1000 / 10) * 10;
 ![TanStack Virtual at 1M items in Helium showing partial rendering where only part of the expected list appears](./imgs/1m_tanstack_helium.jpeg)
 
 </details>
-
-<br />
 
 - Even with those rendering issues, Legend List could still render the end / near-end portion of the 1M-row dataset in some runs.
 
