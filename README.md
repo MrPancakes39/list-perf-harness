@@ -6,6 +6,29 @@ This is my first time building a benchmark, so parts of the setup or methodology
 
 ## Benchmark Setup
 
+### Simple Setup
+
+1. Install dependencies:
+
+```bash
+pnpm install
+```
+
+2. Start the benchmark app:
+
+```bash
+pnpm run dev
+```
+
+3. Open the local URL printed by Vite (usually `http://localhost:5173`).
+4. Run each item count (10K, 25K, 50K, 100K, 1M) for both implementations.
+5. Record first render time, scroll FPS, and memory for each run.
+
+### Tooling Versions
+
+- node: v22.21.0
+- pnpm: 10.15.1
+
 ### Libraries Tested
 
 | Library          | Version       |
@@ -21,7 +44,11 @@ This is my first time building a benchmark, so parts of the setup or methodology
 | Firefox  | 147.0.4 | Gecko                   |
 | Epiphany | 46.5    | WebKit                  |
 
-OS: Pop!\_OS 24.04 COSMIC (kernel 6.18.7-76061807-generic, arch x86_64)
+### Hardware Tested
+
+- OS: Pop!\_OS 24.04 COSMIC (kernel 6.18.7-76061807-generic, arch x86_64)
+- CPU: Intel i7-9750H (12) @ 4.500GHz
+- GPU: NVIDIA GeForce GTX 1660 Ti Mobile
 
 ### Metrics Tracked
 
