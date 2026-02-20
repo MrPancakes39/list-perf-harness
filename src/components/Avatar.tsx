@@ -7,9 +7,9 @@ const avatarVariants = cva(
   {
     variants: {
       gender: {
-        Man: "bg-blue-500",
-        Woman: "bg-fuchsia-500",
-        "Non-Binary": "bg-purple-500",
+        Man: "bg-blue-700",
+        Woman: "bg-pink-700",
+        "Non-Binary": "bg-violet-700",
       },
     },
   }
