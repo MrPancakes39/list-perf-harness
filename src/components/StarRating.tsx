@@ -1,6 +1,6 @@
 import { Star as StarIcon } from "lucide-react";
 import { cva } from "class-variance-authority";
-import { cn } from "../utils";
+import { cn } from "~/lib/utils";
 
 const starVariants = cva("h-4 w-4", {
   variants: {

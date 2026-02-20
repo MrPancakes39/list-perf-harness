@@ -1,6 +1,6 @@
 import { User as UserIcon } from "lucide-react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "../utils";
+import { cn } from "~/lib/utils";
 
 const avatarVariants = cva(
   "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",

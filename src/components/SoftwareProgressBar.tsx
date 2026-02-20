@@ -1,5 +1,5 @@
 import { cva } from "class-variance-authority";
-import { cn } from "../utils";
+import { cn } from "~/lib/utils";
 
 const barVariants = cva("h-full rounded-full", {
   variants: {

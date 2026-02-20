@@ -1,6 +1,6 @@
 import { Flag as FlagIcon } from "lucide-react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "../utils";
+import { cn } from "~/lib/utils";
 
 const trustworthinessBadgeVariants = cva("flex items-center gap-1.5", {
   variants: {
