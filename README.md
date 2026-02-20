@@ -26,10 +26,10 @@ OS: Pop!\_OS 24.04 COSMIC (kernel 6.18.7-76061807-generic, arch x86_64)
 ### Metrics Tracked
 
 - Item counts tested: 10K, 25K, 50K, 100K, 1M
+- React Profiler metrics
 - First render time (ms)
 - Scroll frames per second (FPS)
 - Memory usage (MB)
-- React Profiler render timings
 
 ## Findings
 
@@ -38,6 +38,10 @@ These findings are more anecdotal and experimental than strictly scientific. I c
 > Disclaimer: the numbers discussed below are from my machine, and I am using Helium as the reference browser because Firefox and Epiphany showed worse numbers / performance.
 
 Item count range used in findings: 10K to 1M items.
+
+### React Profiler Metrics
+
+- For both libraries (Legend List and TanStack Virtual), the Profiler behavior was consistent in all tested browsers: one mount commit, then update commits while scrolling.
 
 ### First Render Time
 
