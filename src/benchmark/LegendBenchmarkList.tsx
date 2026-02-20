@@ -40,9 +40,6 @@ export function LegendBenchmarkList({
       data={employees}
       renderItem={renderItem}
       keyExtractor={(employee) => String(employee.EmployeeID)}
-      estimatedItemSize={58}
-      recycleItems
-      drawDistance={320}
       style={{ height, overflow: "auto" }}
       onScroll={onScroll}
     />
