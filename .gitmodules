@@ -1,0 +1,3 @@
+[submodule "vendor/legend-list"]
+	path = vendor/legend-list
+	url = https://github.com/LegendApp/legend-list.git
