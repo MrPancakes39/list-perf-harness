@@ -78,5 +78,9 @@ export function generateEmployees(
     faker.seed(options.seed);
   }
 
-  return Array.from({ length: count }, () => generateEmployee());
+  return Array.from({ length: count }, (_, index) => {
+    const employee = generateEmployee();
+    employee.EmployeeID = index + 1;
+    return employee;
+  });
 }

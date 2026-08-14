@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "test": "node --experimental-strip-types --test tests/generate-data.test.ts",
     "typecheck": "tsc --project ./tsconfig.app.json"
   },
   "dependencies": {
