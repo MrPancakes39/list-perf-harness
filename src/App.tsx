@@ -1,4 +1,10 @@
-import { Profiler, type ProfilerOnRenderCallback, useState } from "react";
+import {
+  Profiler,
+  memo,
+  type ProfilerOnRenderCallback,
+  useCallback,
+  useState,
+} from "react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { LegendBenchmarkList } from "./benchmark/LegendBenchmarkList";
@@ -19,6 +25,7 @@ import {
   DEFAULT_BENCHMARK_SEED,
   generateEmployees,
   resetGeneratorSeed,
+  type Employee,
 } from "./generate-data";
 
 const ITEM_COUNT_OPTIONS = [10000, 25000, 50000, 100000, 1000000];
@@ -98,6 +105,50 @@ function loadThemeSetting() {
   return "system";
 }
 
+interface BenchmarkListPanelProps {
+  activeLibrary: ListLibrary;
+  employees: Employee[];
+  listKey: string;
+  onFirstRenderMs: (library: ListLibrary, ms: number) => void;
+  onProfilerRender: ProfilerOnRenderCallback;
+  onScrollFps: (library: ListLibrary, fps: number) => void;
+}
+
+// Metric updates re-render App, so this boundary must stay stable or the
+// Profiler would measure its own state update and create a render loop.
+const BenchmarkListPanel = memo(function BenchmarkListPanel({
+  activeLibrary,
+  employees,
+  listKey,
+  onFirstRenderMs,
+  onProfilerRender,
+  onScrollFps,
+}: BenchmarkListPanelProps) {
+  return (
+    <section className="rounded-xl border border-border bg-background p-2">
+      {activeLibrary === "tanstack" ? (
+        <Profiler id="tanstack" onRender={onProfilerRender} key={listKey}>
+          <TanStackBenchmarkList
+            employees={employees}
+            height={LIST_HEIGHT}
+            onFirstRenderMs={(ms) => onFirstRenderMs("tanstack", ms)}
+            onScrollFps={(fps) => onScrollFps("tanstack", fps)}
+          />
+        </Profiler>
+      ) : (
+        <Profiler id="legend" onRender={onProfilerRender} key={listKey}>
+          <LegendBenchmarkList
+            employees={employees}
+            height={LIST_HEIGHT}
+            onFirstRenderMs={(ms) => onFirstRenderMs("legend", ms)}
+            onScrollFps={(fps) => onScrollFps("legend", fps)}
+          />
+        </Profiler>
+      )}
+    </section>
+  );
+});
+
 function App() {
   const [activeLibrary, setActiveLibrary] = useQueryState(
     "library",
@@ -124,17 +175,20 @@ function App() {
     resetMetrics();
   };
 
-  const updateLibraryMetrics = (
-    library: ListLibrary,
-    updater: (current: BenchmarkMetrics) => BenchmarkMetrics
-  ) => {
-    setMetricsByLibrary((previous) => {
-      return {
-        ...previous,
-        [library]: updater(previous[library]),
-      };
-    });
-  };
+  const updateLibraryMetrics = useCallback(
+    (
+      library: ListLibrary,
+      updater: (current: BenchmarkMetrics) => BenchmarkMetrics
+    ) => {
+      setMetricsByLibrary((previous) => {
+        return {
+          ...previous,
+          [library]: updater(previous[library]),
+        };
+      });
+    },
+    []
+  );
 
   const applySeed = () => {
     const parsedSeed = Number(seedInput);
@@ -166,37 +220,41 @@ function App() {
     }
   };
 
-  const onProfilerRender: ProfilerOnRenderCallback = (
-    id,
-    phase,
-    actualDuration,
-    baseDuration
-  ) => {
-    if (id !== "tanstack" && id !== "legend") {
-      return;
-    }
+  const onProfilerRender = useCallback<ProfilerOnRenderCallback>(
+    (id, phase, actualDuration, baseDuration) => {
+      if (id !== "tanstack" && id !== "legend") {
+        return;
+      }
 
-    updateLibraryMetrics(id, (current) => {
-      return applyProfilerSample(current, {
-        phase,
-        actualDuration,
-        baseDuration,
+      updateLibraryMetrics(id, (current) => {
+        return applyProfilerSample(current, {
+          phase,
+          actualDuration,
+          baseDuration,
+        });
       });
-    });
-  };
+    },
+    [updateLibraryMetrics]
+  );
 
-  const onFirstRenderMs = (library: ListLibrary, ms: number) => {
-    updateLibraryMetrics(library, (current) => {
-      return applyMemorySnapshot(
-        applyFirstRenderMs(current, ms),
-        createMemorySnapshot()
-      );
-    });
-  };
+  const onFirstRenderMs = useCallback(
+    (library: ListLibrary, ms: number) => {
+      updateLibraryMetrics(library, (current) => {
+        return applyMemorySnapshot(
+          applyFirstRenderMs(current, ms),
+          createMemorySnapshot()
+        );
+      });
+    },
+    [updateLibraryMetrics]
+  );
 
-  const onScrollFps = (library: ListLibrary, fps: number) => {
-    updateLibraryMetrics(library, (current) => applyFpsSample(current, fps));
-  };
+  const onScrollFps = useCallback(
+    (library: ListLibrary, fps: number) => {
+      updateLibraryMetrics(library, (current) => applyFpsSample(current, fps));
+    },
+    [updateLibraryMetrics]
+  );
 
   const activeMetrics = metricsByLibrary[activeLibrary];
   const listKey = `${activeLibrary}-${datasetVersion}`;
@@ -381,27 +439,14 @@ function App() {
         </article>
       </section>
 
-      <section className="rounded-xl border border-border bg-background p-2">
-        {activeLibrary === "tanstack" ? (
-          <Profiler id="tanstack" onRender={onProfilerRender} key={listKey}>
-            <TanStackBenchmarkList
-              employees={employees}
-              height={LIST_HEIGHT}
-              onFirstRenderMs={(ms) => onFirstRenderMs("tanstack", ms)}
-              onScrollFps={(fps) => onScrollFps("tanstack", fps)}
-            />
-          </Profiler>
-        ) : (
-          <Profiler id="legend" onRender={onProfilerRender} key={listKey}>
-            <LegendBenchmarkList
-              employees={employees}
-              height={LIST_HEIGHT}
-              onFirstRenderMs={(ms) => onFirstRenderMs("legend", ms)}
-              onScrollFps={(fps) => onScrollFps("legend", fps)}
-            />
-          </Profiler>
-        )}
-      </section>
+      <BenchmarkListPanel
+        activeLibrary={activeLibrary}
+        employees={employees}
+        listKey={listKey}
+        onFirstRenderMs={onFirstRenderMs}
+        onProfilerRender={onProfilerRender}
+        onScrollFps={onScrollFps}
+      />
 
       <section className="rounded-xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
         <strong className="text-foreground">Fair comparison tips:</strong> keep
